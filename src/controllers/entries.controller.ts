@@ -3,10 +3,8 @@ import pool from '../db';
 
 export const getAllEntries = async (req: Request, res: Response) => {
     try {
-        const result = await pool.query('SELECT entries.* habits.name, habits.category FROM entries JOIN habits ON entries.habit_id = habits.id');
-         if (result.rowCount === 0) {
-            return res.status(404).json({ message: 'Entradas no encontradas' });
-        }
+        const result = await pool.query('SELECT entries.*, habits.name, habits.category FROM entries JOIN habits ON entries.habit_id = habits.id');
+         
         res.json({ message: 'Entradas encontradas', entries: result.rows });
     } catch (error) {
         console.error('Error al obtener entradas:', error);
@@ -18,11 +16,11 @@ export const getAllEntries = async (req: Request, res: Response) => {
 export const getEntriesByHabitId = async (req: Request, res: Response) => {
     try {
         const habitId = req.params.id;
-        const result = await pool.query('SELECT * FROM entries WHERE id = $1', [habitId]);
+        const result = await pool.query('SELECT * FROM entries WHERE habit_id = $1', [habitId]);
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Entradas no encontradas' });
         }
-        res.json({ message: 'Entrada encontrada', entry: result.rows[0] });
+        res.json({ message: 'Entradas encontradas', entries: result.rows });
     } catch (error) {
         console.error('Error al obtener entradas:', error);
         res.status(500).json({ message: 'Error al obtener entradas' });
@@ -54,6 +52,7 @@ export const deleteEntry = async (req: Request, res: Response) => {
             if (result.rowCount === 0) {
                 return res.status(404).json({ message: 'Entrada no encontrada' });
             }
+            res.status(200).json({ message: 'Entrada eliminada', entry: result.rows[0] });
 
         }catch (error) {
             console.error('Error al eliminar entrada:', error);
